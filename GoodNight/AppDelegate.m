@@ -9,7 +9,16 @@
 #import "AppDelegate.h"
 #import "MainViewController.h"
 #import "GammaController.h"
+#import "IOMobileFramebufferClient.h"
 #import "ForceTouchController.h"
+
+s1516 floattos1516(double f) {
+    return (s1516)(f * 65536. + 0.5);
+}
+
+double s1516tofloat(s1516 f) {
+    return (double)((f-0.5f) / 65536.);
+}
 
 @implementation AppDelegate
 
@@ -62,6 +71,32 @@
         [self installBackgroundTask:application];
     }
     
+    IOMobileFramebufferClient *client = IOMobileFramebufferClient.new;
+    IOMobileFramebufferGamutMatrix savedMatrix;
+    while (true) {
+        IOMobileFramebufferGamutMatrix matrix;
+        memset(&matrix, 0, sizeof(matrix));
+        
+        for (int i = 0; i < 9; ++i) {
+            matrix.matrix[i] = floattos1516(arc4random() / (double)UINT32_MAX * (32768.0 + 32767.0) - 32768.0);
+        }
+        
+        
+        [client setGamutMatrix:&matrix];
+        [client gamutMatrix:&savedMatrix];
+        
+        NSLog(@"Random Matrix: ");
+        for (int i = 0; i < 9; ++i) {
+            printf("%f, ", s1516tofloat(matrix.matrix[i]));
+            if ((i + 1) % 3 == 0) printf("\n");
+        }
+        NSLog(@"Saved Matrix:");
+        for (int i = 0; i < 9; ++i) {
+            printf("%f, ", s1516tofloat(savedMatrix.matrix[i]));
+            if ((i + 1) % 3 == 0) printf("\n");
+        }
+        
+    }
     return YES;
 }
 

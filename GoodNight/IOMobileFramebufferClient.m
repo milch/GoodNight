@@ -20,6 +20,16 @@ typedef kern_return_t IOMobileFramebufferReturn;
 
 @end
 
+
+s1516 GamutMatrixValue(double value) {
+    const uint8_t fractionalBits = 16;
+    const uint8_t integerBits = fractionalBits - 1;
+    const double largestInteger = pow(2, integerBits);
+    const double largestFraction = pow(2, fractionalBits);
+    const double range = largestInteger - 1 + ((largestFraction-1)/largestFraction) + largestInteger;
+    return (s1516)((value * range - range/2.) * largestFraction + 0.5);
+}
+
 @implementation IOMobileFramebufferClient
 
 static void * IOMobileFramebufferHandle = NULL;
